@@ -91,3 +91,59 @@ De UniFi API key is op enig moment zichtbaar geweest in een screenshot
 tijdens dit traject. Gebruiker is van plan deze voor productie opnieuw te
 genereren — check of dat al gebeurd is voor je verder gaat met een
 live-deploy.
+
+## Lessons learned / bekende valkuilen
+
+Sectie voor opgeloste problemen die de moeite waard zijn om te onthouden
+voor volgende sessies. Voeg nieuwe incidenten onderaan toe.
+
+### UniFi Content Filtering-policy onderschept DNS-verkeer netwerkbreed (2026-08-13)
+
+**Symptoom**: `cloud.confra.nl` bleef intern verouderd resolven
+(`188.90.37.16` i.p.v. het correcte `85.146.187.253` uit Cloudflare), zelfs
+bij expliciete queries naar `1.1.1.1` of rechtstreeks naar de autoritatieve
+nameservers (rose/simon.ns.cloudflare.com), en zelfs vanaf de Pi-hole-VM
+zelf.
+
+**Oorzaak**: een UniFi **Content Filtering-policy** ("Basic Adult &
+Malicious Filter", te vinden onder een Policies/Traffic Rules-sectie, niet
+onder "Security") onderschept transparant al het poort-53-verkeer op het
+netwerk en had daarbinnen een verouderde cache-entry. Pi-hole, Nginx, de
+Windows DNS-cache en de zoneconfiguratie bij Cloudflare waren nooit het
+probleem — Pi-hole's eigen cache-flushes (`pihole reloaddns`,
+`systemctl restart pihole-FTL`) leken niet te werken, maar in
+werkelijkheid werd elke herhaalde upstream-lookup vanuit Pi-hole gewoon
+opnieuw door dezelfde onderscheppende laag beantwoord.
+
+**Diagnose-aanpak die werkte**:
+1. Vergelijk resolutie via meerdere bronnen tegelijk (systeem-resolver,
+   Cloudflare 1.1.1.1, en rechtstreeks de autoritatieve nameservers) — bij
+   mismatch, exporteer de daadwerkelijke zonedata uit Cloudflare zelf om de
+   "waarheid" vast te stellen.
+2. Test via DNS-over-HTTPS (poort 443, `Invoke-RestMethod` naar
+   `https://cloudflare-dns.com/dns-query`) — dat omzeilt lokale
+   poort-53-onderschepping en gaf meteen het juiste antwoord, wat
+   bevestigde dat het probleem lokaal/netwerkbreed was, niet bij
+   Cloudflare.
+3. Test vanaf een ander apparaat op het netwerk (de Pi-hole-VM zelf, met
+   `dig @1.1.1.1 cloud.confra.nl A +short`) om te bewijzen dat het
+   probleem niet bij één specifiek apparaat zat, maar netwerkbreed was.
+4. Zoek in de UniFi Network-app naar filtering-/policy-features buiten de
+   voor de hand liggende "Security"-tab — deze zaten in dit geval onder een
+   losse Policies-sectie.
+
+**Fix**: Content Filtering-policy tijdelijk op **Off** gezet → direct
+correcte, verse DNS-antwoorden (TTL 300, matcht Cloudflare exact).
+
+**Les**: bij "DNS geeft overal een verouderd antwoord, ook bij expliciete
+externe servers" — verdenk als eerste een netwerkbrede interceptielaag
+(content filtering / DNS-filtering op de gateway), niet de individuele
+DNS-server of client. Herkenningspunten: het foute antwoord is overal
+hetzelfde, cache-flushes op de voor de hand liggende server (hier: Pi-hole)
+lossen het niet op, maar DoH (poort 443) geeft wél meteen het juiste
+antwoord.
+
+Hulpscript (lokaal bij Frank, niet in deze repo): `Check-CloudConfra-DNS.ps1`
+— PowerShell-script dat systeem-resolver, Cloudflare 1.1.1.1, en de
+autoritatieve nameservers automatisch vergelijkt en waarschuwt bij een
+mismatch.
