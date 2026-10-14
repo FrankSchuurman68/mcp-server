@@ -8,7 +8,9 @@ services:
       - UNIFI_API_KEY=${UNIFI_API_KEY}
       - UNIFI_SITE_ID=${UNIFI_SITE_ID:-default}
       - UNIFI_VERIFY_SSL=${UNIFI_VERIFY_SSL:-false}
+      - HA_URL=${HA_URL:-}
+      - HA_TOKEN=${HA_TOKEN:-}
     ports:
       # Alleen bereikbaar binnen je LAN/VPN — publiceer deze poort NOOIT
       # rechtstreeks naar het internet.
-      - "8000:8000"
+      - "8001:8000"

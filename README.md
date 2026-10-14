@@ -70,9 +70,13 @@ verschijnen (bijv. `ha_list_entities`, `pm_vm_action`, `uf_client_action`).
 | UniFi  | `uf_list_devices`    | Netwerk-apparaten op de site                |
 | UniFi  | `uf_list_clients`    | Verbonden clients + blokkeer-status          |
 | UniFi  | `uf_client_action`   | Client blokkeren/deblokkeren op MAC-adres    |
+| Home Assistant | `ha_list_entities` | Entiteiten zoeken (alleen lezen)            |
+| Home Assistant | `ha_get_state`     | Status van één entiteit (alleen lezen)       |
+| Home Assistant | `ha_statistic_ids` | Beschikbare statistieken (kWh-tellers e.d.)  |
+| Home Assistant | `ha_statistics`    | Uur-/dag-statistieken ophalen (alleen lezen) |
 
-Proxmox- en Home Assistant-tools staan gepland als los uitbreidingsproject
-(de code is al ontworpen, komt later terug).
+De Home Assistant-tools lezen alleen. Ze hebben `HA_URL` en `HA_TOKEN` nodig in de
+omgeving van de container. Proxmox-tools staan gepland als los uitbreidingsproject.
 
 ## 5. Uitbreiden
 
