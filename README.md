@@ -67,9 +67,19 @@ verschijnen (bijv. `ha_list_entities`, `pm_vm_action`, `uf_client_action`).
 
 | Module | Tool               | Omschrijving                              |
 | ------ | ------------------- | ------------------------------------------ |
+| UniFi  | `uf_info`            | Versie van UniFi Network (alleen lezen)      |
 | UniFi  | `uf_list_devices`    | Netwerk-apparaten op de site                |
-| UniFi  | `uf_list_clients`    | Verbonden clients + blokkeer-status          |
+| UniFi  | `uf_list_clients`    | Verbonden clients (alle pagina's)            |
+| UniFi  | `uf_list_networks`   | Netwerken/VLAN's (alleen lezen)              |
+| UniFi  | `uf_list_wifi`       | Wifi-netwerken/SSID's + VLAN (alleen lezen)  |
+| UniFi  | `uf_list_firewall_zones`    | Firewallzones (alleen lezen)          |
+| UniFi  | `uf_list_firewall_policies` | Firewallregels tussen zones (alleen lezen) |
+| UniFi  | `uf_list_acl_rules`  | ACL-regels op switchniveau (alleen lezen)    |
 | UniFi  | `uf_client_action`   | Client blokkeren/deblokkeren op MAC-adres    |
+
+Alle `uf_list_*`-tools ondersteunen paginering: standaard worden alle pagina's
+opgehaald (`fetch_all=true`); met `fetch_all=false` plus `offset`/`limit` (max 200)
+haal je één pagina op. De UniFi-API geeft zelf maar 25 items per aanroep.
 | Home Assistant | `ha_list_entities` | Entiteiten zoeken (alleen lezen)            |
 | Home Assistant | `ha_get_state`     | Status van één entiteit (alleen lezen)       |
 | Home Assistant | `ha_statistic_ids` | Beschikbare statistieken (kWh-tellers e.d.)  |
