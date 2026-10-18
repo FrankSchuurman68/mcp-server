@@ -10,6 +10,10 @@ services:
       - UNIFI_VERIFY_SSL=${UNIFI_VERIFY_SSL:-false}
       - HA_URL=${HA_URL:-}
       - HA_TOKEN=${HA_TOKEN:-}
+      - PIHOLE_HOSTS=${PIHOLE_HOSTS:-}
+      - PIHOLE_PASSWORD=${PIHOLE_PASSWORD:-}
+      - PIHOLE_PASSWORD_PIHOLE1=${PIHOLE_PASSWORD_PIHOLE1:-}
+      - PIHOLE_PASSWORD_PIHOLE2=${PIHOLE_PASSWORD_PIHOLE2:-}
     ports:
       # Alleen bereikbaar binnen je LAN/VPN — publiceer deze poort NOOIT
       # rechtstreeks naar het internet.

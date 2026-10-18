@@ -4,7 +4,7 @@ Laadt alle actieve tool-modules (waardoor hun @mcp.tool functies
 geregistreerd worden) en start de server via Streamable HTTP, zodat hij
 als container bereikbaar is op je LAN/VPN voor Claude Desktop of Claude Code.
 
-Scope: UniFi en (alleen-lezen) Home Assistant. Proxmox volgt later als apart
+Scope: UniFi en (alleen-lezen) Home Assistant en Pi-hole. Proxmox volgt later als apart
 uitbreidingsproject (de tool-structuur is er al klaar voor).
 """
 
@@ -17,6 +17,7 @@ from app import mcp
 # ook al lijkt hij "ongebruikt".
 import unifi  # noqa: F401
 import ha  # noqa: F401
+import pihole  # noqa: F401
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
