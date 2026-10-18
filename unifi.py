@@ -44,8 +44,16 @@ def _list(path: str, offset: int = 0, limit: int = 100, fetch_all: bool = True, 
     items: list = []
     total = None
     pos = max(0, offset)
+    size = PAGE_SIZE
     while True:
-        page = _get(path, {**base, "offset": pos, "limit": PAGE_SIZE})
+        try:
+            page = _get(path, {**base, "offset": pos, "limit": size})
+        except requests.HTTPError as e:
+            # Sommige endpoints (bv. firewall) accepteren een kleinere maximale limit: verklein stapsgewijs.
+            if e.response is not None and e.response.status_code == 400 and size > 25:
+                size = 100 if size > 100 else 50 if size > 50 else 25
+                continue
+            raise
         data = page.get("data", [])
         total = page.get("totalCount", total)
         items.extend(data)
