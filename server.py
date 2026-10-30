@@ -18,6 +18,7 @@ from app import mcp
 import unifi  # noqa: F401
 import ha  # noqa: F401
 import pihole  # noqa: F401
+import advisor  # noqa: F401
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
